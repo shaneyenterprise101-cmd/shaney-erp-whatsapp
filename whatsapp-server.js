@@ -401,6 +401,39 @@ app.post('/api/whatsapp/send-file', async (req, res) => {
         res.json({ success: false, error: error.message });
     }
 });
+app.post('/api/whatsapp/send-pdf', async (req, res) => {
+    try {
+        const { phone, message, pdfBase64, filename } = req.body;
+        if (!phone || !pdfBase64) return res.json({ success: false, error: "Phone and pdfBase64 required" });
+        
+        let cleanPhone = phone.replace(/\D/g, '');
+        if (cleanPhone.length === 10) cleanPhone = "91" + cleanPhone;
+        const jid = `${cleanPhone}@s.whatsapp.net`;
+        
+        if (waSocket) {
+            const buffer = Buffer.from(pdfBase64, 'base64');
+            let msgObject = { 
+                document: buffer, 
+                mimetype: 'application/pdf', 
+                fileName: filename || 'document.pdf', 
+                caption: message || '' 
+            };
+
+            const sent = await waSocket.sendMessage(jid, msgObject);
+            const realId = sent.key.id;
+
+            db.run(`INSERT OR IGNORE INTO messages (id, remoteJid, fromMe, body, timestamp) VALUES (?, ?, ?, ?, ?)`,
+                [realId, jid, 1, `[PDF Sent: ${filename}]`, (sent.messageTimestamp * 1000) || Date.now()]
+            );
+
+            res.json({ success: true, id: realId, timestamp: (sent.messageTimestamp * 1000) || Date.now() });
+        } else {
+            res.json({ success: false, error: "Not connected" });
+        }
+    } catch (error) {
+        res.json({ success: false, error: error.message });
+    }
+});
 
 // 🟢 NEW: DELETE FOR EVERYONE API
 app.post('/api/whatsapp/delete-for-everyone', async (req, res) => {
