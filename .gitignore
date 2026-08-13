@@ -1,1 +1,4 @@
-node_modules
+baileys_auth_info/
+whatsapp_local.db
+node_modules/
+.env
