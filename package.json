@@ -1,0 +1,23 @@
+{
+  "name": "shaney-whatsapp-server",
+  "version": "1.0.0",
+  "description": "WhatsApp Bot and Baileys Server for Shaney ERP",
+  "main": "whatsapp-server.js",
+  "scripts": {
+    "start": "node whatsapp-server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@whiskeysockets/baileys": "^7.0.0-rc14",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pino": "^10.3.1",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.3",
+    "sqlite3": "^6.0.1"
+  }
+}
