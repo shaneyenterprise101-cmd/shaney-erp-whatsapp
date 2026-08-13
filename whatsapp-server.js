@@ -229,7 +229,25 @@ async function connectToWhatsApp() {
         }
     });
 }
+// 🟢 Live Online, Typing & Last Seen Tracker
+    waSocket.ev.on('presence.update', async (presence) => {
+        try {
+            const jid = presence.id; // Sender JID
+            const participant = presence.presences ? Object.keys(presence.presences)[0] : null;
+            const status = participant ? presence.presences[participant].lastKnownPresence : null; // 'available' (online), 'composing' (typing), etc.
+            
+            let cleanPhone = jid.replace('@s.whatsapp.net', '').replace('@c.us', '').replace(/\D/g, '');
 
+            // Frontend UI ko live signal bhejein
+            io.emit('presence_update', {
+                phone: cleanPhone,
+                status: status, // 'composing' matlab typing, 'available' matlab online
+                lastSeen: presence.presences?.[participant]?.lastSeen
+            });
+        } catch (err) {
+            console.error("Presence update error:", err);
+        }
+    });
 // ==========================================
 // 🌐 BACKEND API ROUTES
 // ==========================================
